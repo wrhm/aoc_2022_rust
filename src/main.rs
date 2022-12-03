@@ -20,7 +20,7 @@ fn get_file_contents(filename: &str) -> String {
 
 fn day_01() {
     let now = Instant::now();
-    let s = get_file_contents("01.txt");
+    let s = get_file_contents("data/01.txt");
     let lines: Vec<&str> = s.split('\n').collect();
 
     let mut vecs: Vec<Vec<i32>> = vec![];
@@ -51,7 +51,7 @@ fn day_01() {
 
 fn day_02() {
     let now = Instant::now();
-    let s = get_file_contents("02.txt");
+    let s = get_file_contents("data/02.txt");
     let lines: Vec<&str> = s.split('\n').collect();
     let mut pairs: Vec<(char, char)> = vec![];
     for line in &lines {
