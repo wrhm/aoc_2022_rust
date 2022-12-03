@@ -3,10 +3,8 @@ use crate::util;
 use std::collections::HashMap;
 use std::time::Instant;
 
-pub(crate) fn day_02() {
-    let now = Instant::now();
-    let s = util::get_file_contents("data/02.txt");
-    let lines: Vec<&str> = s.split('\n').collect();
+fn day_02_impl(file_contents: &str) -> (i32, i32) {
+    let lines: Vec<&str> = file_contents.split('\n').collect();
 
     // parse the two letters from each line of the file
     let mut pairs: Vec<(char, char)> = vec![];
@@ -82,9 +80,27 @@ pub(crate) fn day_02() {
         }
         total_score2 += score;
     }
-
     let ans1 = total_score;
     let ans2 = total_score2;
+    (ans1, ans2)
+}
+
+pub(crate) fn day_02(filename: &str) {
+    let now = Instant::now();
+    let file_contents = util::get_file_contents(filename);
+    let (ans1, ans2) = day_02_impl(&file_contents);
     let elapsed = now.elapsed();
     println!("Day 02: {}, {}. {:?}", ans1, ans2, elapsed);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::day_02_impl;
+    use crate::util;
+
+    #[test]
+    fn unit_test() {
+        let file_contents = util::get_file_contents("src/data/testing/02.txt");
+        assert_eq!(day_02_impl(&file_contents), (15, 12))
+    }
 }
