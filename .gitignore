@@ -1,7 +1,4 @@
 /target
-
+/data
 Cargo.lock
-
 src/aoc.py
-
-data/*.txt
