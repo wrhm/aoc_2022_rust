@@ -3,3 +3,5 @@
 Cargo.lock
 
 src/aoc.py
+
+data/*.txt
