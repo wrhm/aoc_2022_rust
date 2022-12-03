@@ -1,7 +1,44 @@
 use crate::util;
 
+use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::time::Instant;
+
+#[derive(PartialEq, Eq, Hash)]
+enum RPS {
+    R, // rock
+    P, // paper
+    S, // scissors
+}
+fn beats(a: &RPS, b: &RPS) -> bool {
+    (a, b) == (&RPS::R, &RPS::S) || (a, b) == (&RPS::S, &RPS::P) || (a, b) == (&RPS::P, &RPS::R)
+}
+fn ties(a: &RPS, b: &RPS) -> bool {
+    a == b
+}
+
+#[derive(PartialEq, Eq, Hash)]
+enum Goal {
+    LOSE,
+    DRAW,
+    WIN,
+}
+
+lazy_static! {
+    static ref FORCED_RESPONSE: HashMap<(&'static RPS, &'static Goal), &'static RPS> = {
+        let mut map = HashMap::new();
+        map.insert((&RPS::R, &Goal::LOSE), &RPS::S);
+        map.insert((&RPS::R, &Goal::DRAW), &RPS::R);
+        map.insert((&RPS::R, &Goal::WIN), &RPS::P);
+        map.insert((&RPS::P, &Goal::LOSE), &RPS::R);
+        map.insert((&RPS::P, &Goal::DRAW), &RPS::P);
+        map.insert((&RPS::P, &Goal::WIN), &RPS::S);
+        map.insert((&RPS::S, &Goal::LOSE), &RPS::P);
+        map.insert((&RPS::S, &Goal::DRAW), &RPS::S);
+        map.insert((&RPS::S, &Goal::WIN), &RPS::R);
+        map
+    };
+}
 
 fn day_02_impl(file_contents: &str) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
@@ -13,19 +50,6 @@ fn day_02_impl(file_contents: &str) -> (i32, i32) {
             continue;
         }
         pairs.push((line.chars().nth(0).unwrap(), line.chars().nth(2).unwrap()));
-    }
-
-    #[derive(PartialEq, Eq, Hash)]
-    enum RPS {
-        R, // rock
-        P, // paper
-        S, // scissors
-    }
-    fn beats(a: &RPS, b: &RPS) -> bool {
-        (a, b) == (&RPS::R, &RPS::S) || (a, b) == (&RPS::S, &RPS::P) || (a, b) == (&RPS::P, &RPS::R)
-    }
-    fn ties(a: &RPS, b: &RPS) -> bool {
-        a == b
     }
 
     let xyz_score = HashMap::from([(RPS::R, 1), (RPS::P, 2), (RPS::S, 3)]);
@@ -47,31 +71,14 @@ fn day_02_impl(file_contents: &str) -> (i32, i32) {
         total_score += score;
     }
 
-    #[derive(PartialEq, Eq, Hash)]
-    enum Goal {
-        LOSE,
-        DRAW,
-        WIN,
-    }
-
     // part 2 interpretation (RPS, Goal)
     let xyz_goal = HashMap::from([('X', Goal::LOSE), ('Y', Goal::DRAW), ('Z', Goal::WIN)]);
-    let mut response: HashMap<(&RPS, &Goal), &RPS> = HashMap::new();
-    response.insert((&RPS::R, &Goal::LOSE), &RPS::S);
-    response.insert((&RPS::R, &Goal::DRAW), &RPS::R);
-    response.insert((&RPS::R, &Goal::WIN), &RPS::P);
-    response.insert((&RPS::P, &Goal::LOSE), &RPS::R);
-    response.insert((&RPS::P, &Goal::DRAW), &RPS::P);
-    response.insert((&RPS::P, &Goal::WIN), &RPS::S);
-    response.insert((&RPS::S, &Goal::LOSE), &RPS::P);
-    response.insert((&RPS::S, &Goal::DRAW), &RPS::S);
-    response.insert((&RPS::S, &Goal::WIN), &RPS::R);
 
     let mut total_score2 = 0;
     for (them, you) in &pairs {
         let them_rps = rps_abc.get(&them).unwrap();
         let goal = xyz_goal.get(&you).unwrap();
-        let resp = *response.get(&(them_rps, goal)).unwrap();
+        let resp = FORCED_RESPONSE.get(&(them_rps, goal)).unwrap();
         let mut score = *xyz_score.get(resp).unwrap();
         if goal == &Goal::WIN {
             score += 6;

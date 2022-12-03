@@ -27,7 +27,7 @@ fn day_01_impl(file_contents: &str) -> (i32, i32) {
     }
     // sort decreasing to find three largest
     sums.sort_by(|a, b| b.cmp(a));
-    let ans1 = *sums.iter().max().unwrap();
+    let ans1 = sums[0];
     let ans2 = sums[0] + sums[1] + sums[2];
     (ans1, ans2)
 }
