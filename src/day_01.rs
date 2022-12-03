@@ -48,6 +48,8 @@ mod tests {
     #[test]
     fn unit_test() {
         let file_contents = util::get_file_contents("test_data/01.txt");
-        assert_eq!(day_01_impl(&file_contents), (24000, 45000))
+        let (ans1, ans2) = day_01_impl(&file_contents);
+        assert_eq!(ans1, 24000);
+        assert_eq!(ans2, 45000);
     }
 }
