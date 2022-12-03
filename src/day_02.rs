@@ -7,6 +7,8 @@ pub(crate) fn day_02() {
     let now = Instant::now();
     let s = util::get_file_contents("data/02.txt");
     let lines: Vec<&str> = s.split('\n').collect();
+
+    // parse the two letters from each line of the file
     let mut pairs: Vec<(char, char)> = vec![];
     for line in &lines {
         if line.len() < 3 {
@@ -17,9 +19,9 @@ pub(crate) fn day_02() {
 
     #[derive(PartialEq, Eq, Hash)]
     enum RPS {
-        R,
-        P,
-        S,
+        R, // rock
+        P, // paper
+        S, // scissors
     }
     fn beats(a: &RPS, b: &RPS) -> bool {
         (a, b) == (&RPS::R, &RPS::S) || (a, b) == (&RPS::S, &RPS::P) || (a, b) == (&RPS::P, &RPS::R)
@@ -27,9 +29,12 @@ pub(crate) fn day_02() {
     fn ties(a: &RPS, b: &RPS) -> bool {
         a == b
     }
+
+    let xyz_score = HashMap::from([(RPS::R, 1), (RPS::P, 2), (RPS::S, 3)]);
+
+    // part 1 interpretation (RPS, RPS)
     let rps_abc = HashMap::from([('A', RPS::R), ('B', RPS::P), ('C', RPS::S)]);
     let rps_xyz = HashMap::from([('X', RPS::R), ('Y', RPS::P), ('Z', RPS::S)]);
-    let xyz_score = HashMap::from([(RPS::R, 1), (RPS::P, 2), (RPS::S, 3)]);
 
     let mut total_score = 0;
     for (them, you) in &pairs {
@@ -51,8 +56,8 @@ pub(crate) fn day_02() {
         WIN,
     }
 
+    // part 2 interpretation (RPS, Goal)
     let xyz_goal = HashMap::from([('X', Goal::LOSE), ('Y', Goal::DRAW), ('Z', Goal::WIN)]);
-
     let mut response: HashMap<(&RPS, &Goal), &RPS> = HashMap::new();
     response.insert((&RPS::R, &Goal::LOSE), &RPS::S);
     response.insert((&RPS::R, &Goal::DRAW), &RPS::R);
