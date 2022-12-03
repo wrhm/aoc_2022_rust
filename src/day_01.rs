@@ -2,10 +2,8 @@ use crate::util;
 
 use std::time::Instant;
 
-pub(crate) fn day_01() {
-    let now = Instant::now();
-    let s = util::get_file_contents("data/01.txt");
-    let lines: Vec<&str> = s.split('\n').collect();
+fn day_01_impl(file_contents: &str) -> (i32, i32) {
+    let lines: Vec<&str> = file_contents.split('\n').collect();
 
     // parse file into groups of food items held by each elf
     let mut vecs: Vec<Vec<i32>> = vec![];
@@ -29,8 +27,27 @@ pub(crate) fn day_01() {
     }
     // sort decreasing to find three largest
     sums.sort_by(|a, b| b.cmp(a));
-    let ans1 = sums.iter().max().unwrap();
+    let ans1 = *sums.iter().max().unwrap();
     let ans2 = sums[0] + sums[1] + sums[2];
+    (ans1, ans2)
+}
+
+pub(crate) fn day_01(filename: &str) {
+    let now = Instant::now();
+    let file_contents = util::get_file_contents(filename);
+    let (ans1, ans2) = day_01_impl(&file_contents);
     let elapsed = now.elapsed();
     println!("Day 01: {}, {}. {:?}", ans1, ans2, elapsed);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::day_01_impl;
+    use crate::util;
+
+    #[test]
+    fn unit_test() {
+        let file_contents = util::get_file_contents("src/data/testing/01.txt");
+        assert_eq!(day_01_impl(&file_contents), (24000, 45000))
+    }
 }
