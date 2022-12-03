@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn unit_test() {
-        let file_contents = util::get_file_contents("src/data/testing/02.txt");
+        let file_contents = util::get_file_contents("test_data/02.txt");
         assert_eq!(day_02_impl(&file_contents), (15, 12))
     }
 }
