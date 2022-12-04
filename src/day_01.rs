@@ -10,7 +10,7 @@ fn day_01_impl(file_contents: &str) -> (i32, i32) {
     let mut vec: Vec<i32> = vec![];
     for line in &lines {
         let val_or = line.parse::<i32>();
-        if val_or.is_ok() {
+        if let Ok(..) = val_or {
             vec.push(val_or.unwrap());
         } else {
             vecs.push(vec);
