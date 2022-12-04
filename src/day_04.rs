@@ -18,7 +18,7 @@ fn day_04_impl(file_contents: &str) -> (i32, i32) {
         let c = right_nums[0].parse::<i32>().unwrap();
         let d = right_nums[1].parse::<i32>().unwrap();
 
-        // (a,b) is within [c,d] or [c,d] is within [a,b]
+        // [a,b] is within [c,d] or [c,d] is within [a,b]
         if (a >= c && b <= d) || (c >= a && d <= b) {
             count += 1;
         }
