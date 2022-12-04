@@ -19,23 +19,23 @@ fn ties(a: &RPS, b: &RPS) -> bool {
 
 #[derive(PartialEq, Eq, Hash)]
 enum Goal {
-    LOSE,
-    DRAW,
-    WIN,
+    Lose,
+    Draw,
+    Win,
 }
 
 lazy_static! {
     static ref FORCED_RESPONSE: HashMap<(&'static RPS, &'static Goal), &'static RPS> = {
         let mut map = HashMap::new();
-        map.insert((&RPS::R, &Goal::LOSE), &RPS::S);
-        map.insert((&RPS::R, &Goal::DRAW), &RPS::R);
-        map.insert((&RPS::R, &Goal::WIN), &RPS::P);
-        map.insert((&RPS::P, &Goal::LOSE), &RPS::R);
-        map.insert((&RPS::P, &Goal::DRAW), &RPS::P);
-        map.insert((&RPS::P, &Goal::WIN), &RPS::S);
-        map.insert((&RPS::S, &Goal::LOSE), &RPS::P);
-        map.insert((&RPS::S, &Goal::DRAW), &RPS::S);
-        map.insert((&RPS::S, &Goal::WIN), &RPS::R);
+        map.insert((&RPS::R, &Goal::Lose), &RPS::S);
+        map.insert((&RPS::R, &Goal::Draw), &RPS::R);
+        map.insert((&RPS::R, &Goal::Win), &RPS::P);
+        map.insert((&RPS::P, &Goal::Lose), &RPS::R);
+        map.insert((&RPS::P, &Goal::Draw), &RPS::P);
+        map.insert((&RPS::P, &Goal::Win), &RPS::S);
+        map.insert((&RPS::S, &Goal::Lose), &RPS::P);
+        map.insert((&RPS::S, &Goal::Draw), &RPS::S);
+        map.insert((&RPS::S, &Goal::Win), &RPS::R);
         map
     };
 }
@@ -49,7 +49,8 @@ fn day_02_impl(file_contents: &str) -> (i32, i32) {
         if line.len() < 3 {
             continue;
         }
-        pairs.push((line.chars().nth(0).unwrap(), line.chars().nth(2).unwrap()));
+        let char_vec: Vec<char> = line.chars().collect();
+        pairs.push((char_vec[0], char_vec[2]));
     }
 
     let xyz_score = HashMap::from([(RPS::R, 1), (RPS::P, 2), (RPS::S, 3)]);
@@ -60,8 +61,8 @@ fn day_02_impl(file_contents: &str) -> (i32, i32) {
 
     let mut total_score = 0;
     for (them, you) in &pairs {
-        let them_rps = rps_abc.get(&them).unwrap();
-        let you_rps = rps_xyz.get(&you).unwrap();
+        let them_rps = rps_abc.get(them).unwrap();
+        let you_rps = rps_xyz.get(you).unwrap();
         let mut score: i32 = *xyz_score.get(you_rps).unwrap();
         if beats(you_rps, them_rps) {
             score += 6;
@@ -72,17 +73,17 @@ fn day_02_impl(file_contents: &str) -> (i32, i32) {
     }
 
     // part 2 interpretation (RPS, Goal)
-    let xyz_goal = HashMap::from([('X', Goal::LOSE), ('Y', Goal::DRAW), ('Z', Goal::WIN)]);
+    let xyz_goal = HashMap::from([('X', Goal::Lose), ('Y', Goal::Draw), ('Z', Goal::Win)]);
 
     let mut total_score2 = 0;
     for (them, you) in &pairs {
-        let them_rps = rps_abc.get(&them).unwrap();
-        let goal = xyz_goal.get(&you).unwrap();
+        let them_rps = rps_abc.get(them).unwrap();
+        let goal = xyz_goal.get(you).unwrap();
         let resp = FORCED_RESPONSE.get(&(them_rps, goal)).unwrap();
         let mut score = *xyz_score.get(resp).unwrap();
-        if goal == &Goal::WIN {
+        if goal == &Goal::Win {
             score += 6;
-        } else if goal == &Goal::DRAW {
+        } else if goal == &Goal::Draw {
             score += 3;
         }
         total_score2 += score;
