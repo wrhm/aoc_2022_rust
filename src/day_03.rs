@@ -25,16 +25,14 @@ fn day_03_impl(file_contents: &str) -> (i32, i32) {
     for line in &lines {
         let n = line.len();
         let nh = n / 2;
-        let mut i = 0;
         let mut left_counts: HashMap<char, i32> = HashMap::new();
         let mut right_counts: HashMap<char, i32> = HashMap::new();
-        for c in line.chars() {
+        for (i, c) in line.chars().enumerate() {
             if i < nh {
                 *left_counts.entry(c).or_insert(1) += 1;
             } else {
                 *right_counts.entry(c).or_insert(1) += 1;
             }
-            i += 1;
         }
 
         let mut c = 'A';
@@ -66,7 +64,7 @@ fn day_03_impl(file_contents: &str) -> (i32, i32) {
         let mut g: Vec<&str> = vec![];
         for _ in 0..3 {
             let x = lines_iter.next();
-            if x.is_some() {
+            if let Some(..) = x {
                 g.push(x.unwrap());
             }
         }

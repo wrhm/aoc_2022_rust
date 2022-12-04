@@ -32,6 +32,7 @@ fn day_04_impl(file_contents: &str) -> (i32, i32) {
     (ans1, ans2)
 }
 
+// TODO: abstract out into util by passing a fn arg, with overloads for each return type (two ints, two strs).
 pub(crate) fn day_04(filename: &str) {
     let now = Instant::now();
     let file_contents = util::get_file_contents(filename);
