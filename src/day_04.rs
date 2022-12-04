@@ -1,7 +1,5 @@
 use crate::util;
 
-use std::time::Instant;
-
 fn day_04_impl(file_contents: &str) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
     let mut count = 0;
@@ -32,13 +30,8 @@ fn day_04_impl(file_contents: &str) -> (i32, i32) {
     (ans1, ans2)
 }
 
-// TODO: abstract out into util by passing a fn arg, with overloads for each return type (two ints, two strs).
 pub(crate) fn day_04(filename: &str) {
-    let now = Instant::now();
-    let file_contents = util::get_file_contents(filename);
-    let (ans1, ans2) = day_04_impl(&file_contents);
-    let elapsed = now.elapsed();
-    println!("Day 04: {}, {}. {:?}", ans1, ans2, elapsed);
+    util::day_n_i32_i32(filename, "04", day_04_impl);
 }
 
 #[cfg(test)]

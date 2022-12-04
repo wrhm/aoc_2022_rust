@@ -2,7 +2,6 @@ use crate::util;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
-use std::time::Instant;
 
 #[derive(PartialEq, Eq, Hash)]
 enum RPS {
@@ -94,11 +93,7 @@ fn day_02_impl(file_contents: &str) -> (i32, i32) {
 }
 
 pub(crate) fn day_02(filename: &str) {
-    let now = Instant::now();
-    let file_contents = util::get_file_contents(filename);
-    let (ans1, ans2) = day_02_impl(&file_contents);
-    let elapsed = now.elapsed();
-    println!("Day 02: {}, {}. {:?}", ans1, ans2, elapsed);
+    util::day_n_i32_i32(filename, "02", day_02_impl);
 }
 
 #[cfg(test)]

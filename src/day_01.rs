@@ -1,7 +1,5 @@
 use crate::util;
 
-use std::time::Instant;
-
 fn day_01_impl(file_contents: &str) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
 
@@ -33,11 +31,7 @@ fn day_01_impl(file_contents: &str) -> (i32, i32) {
 }
 
 pub(crate) fn day_01(filename: &str) {
-    let now = Instant::now();
-    let file_contents = util::get_file_contents(filename);
-    let (ans1, ans2) = day_01_impl(&file_contents);
-    let elapsed = now.elapsed();
-    println!("Day 01: {}, {}. {:?}", ans1, ans2, elapsed);
+    util::day_n_i32_i32(filename, "01", day_01_impl);
 }
 
 #[cfg(test)]
