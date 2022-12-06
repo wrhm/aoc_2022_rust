@@ -20,7 +20,6 @@ fn day_05_impl(file_contents: &str) -> (String, String) {
             break;
         }
     }
-    println!("ncol: {}", ncol);
 
     let mut stacks: Vec<Vec<char>> = vec![];
     // include an unused stack #0 to reduce off-by-one errors
@@ -44,13 +43,11 @@ fn day_05_impl(file_contents: &str) -> (String, String) {
     }
 
     for i in 0..ncol + 1 {
-        // stacks.push(vec![]);
         stacks[i as usize].reverse();
     }
 
-    // for s in &stacks {
-    //     println!("stack: {:?}", s);
-    // }
+    // allow running the part 2 logic on the same prepared data
+    let mut stacks2 = stacks.clone();
 
     // handle moves
     for line in &lines {
@@ -64,16 +61,26 @@ fn day_05_impl(file_contents: &str) -> (String, String) {
         let n = nums[0];
         let src = nums[1];
         let dest = nums[2];
+
+        // in part 2, use a buffer to reverse the moved substacks, to
+        // preserve crate order.
+        let mut buf: Vec<char> = vec![];
+
         for _ in 0..n {
             let c = stacks[src].pop().unwrap();
-            // println!("Moving {} from {} to {}", c, src, dest);
             stacks[dest].push(c);
-            // println!("{:?}", stacks);
+
+            let c2 = stacks2[src].pop().unwrap();
+            buf.push(c2);
+        }
+        buf.reverse();
+        for c in buf {
+            stacks2[dest].push(c);
         }
     }
 
-    let ans1: String = stacks[1..].iter().map(|x| x.last().unwrap()).collect();
-    let ans2 = "".to_string();
+    let ans1 = stacks[1..].iter().map(|x| x.last().unwrap()).collect();
+    let ans2 = stacks2[1..].iter().map(|x| x.last().unwrap()).collect();
     (ans1, ans2)
 }
 
