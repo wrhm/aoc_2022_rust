@@ -2,6 +2,7 @@ use crate::util;
 
 use lazy_static::lazy_static;
 use std::collections::HashMap;
+use std::time::Instant;
 
 #[derive(PartialEq, Eq, Hash)]
 enum RPS {
@@ -39,7 +40,7 @@ lazy_static! {
     };
 }
 
-fn day_02_impl(file_contents: &str) -> (i32, i32) {
+fn day_02_both_parts(file_contents: &str) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
 
     // parse the two letters from each line of the file
@@ -93,18 +94,22 @@ fn day_02_impl(file_contents: &str) -> (i32, i32) {
 }
 
 pub(crate) fn day_02(filename: &str) {
-    util::day_n_i32_i32(filename, "02", day_02_impl);
+    let now = Instant::now();
+    let file_contents = util::get_file_contents(filename);
+    let (ans1, ans2) = day_02_both_parts(&file_contents);
+    let elapsed = now.elapsed();
+    println!("Day 02: {}, {}. {:?}", ans1, ans2, elapsed);
 }
 
 #[cfg(test)]
 mod tests {
-    use super::day_02_impl;
+    use super::day_02_both_parts;
     use crate::util;
 
     #[test]
     fn unit_test() {
         let file_contents = util::get_file_contents("test_data/02.txt");
-        let (ans1, ans2) = day_02_impl(&file_contents);
+        let (ans1, ans2) = day_02_both_parts(&file_contents);
         assert_eq!(ans1, 15);
         assert_eq!(ans2, 12);
     }

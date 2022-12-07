@@ -2,6 +2,7 @@ use crate::util;
 
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::time::Instant;
 
 fn priority(c: char) -> i32 {
     // Lowercase item types a through z have priorities 1 through 26.
@@ -17,7 +18,7 @@ fn priority(c: char) -> i32 {
     }
 }
 
-fn day_03_impl(file_contents: &str) -> (i32, i32) {
+fn day_03_both_parts(file_contents: &str) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
 
     let mut sum = 0;
@@ -93,12 +94,16 @@ fn day_03_impl(file_contents: &str) -> (i32, i32) {
 }
 
 pub(crate) fn day_03(filename: &str) {
-    util::day_n_i32_i32(filename, "03", day_03_impl);
+    let now = Instant::now();
+    let file_contents = util::get_file_contents(filename);
+    let (ans1, ans2) = day_03_both_parts(&file_contents);
+    let elapsed = now.elapsed();
+    println!("Day 03: {}, {}. {:?}", ans1, ans2, elapsed);
 }
 
 #[cfg(test)]
 mod tests {
-    use super::day_03_impl;
+    use super::day_03_both_parts;
     use super::priority;
     use crate::util;
 
@@ -113,7 +118,7 @@ mod tests {
     #[test]
     fn unit_test() {
         let file_contents = util::get_file_contents("test_data/03.txt");
-        let (ans1, ans2) = day_03_impl(&file_contents);
+        let (ans1, ans2) = day_03_both_parts(&file_contents);
         assert_eq!(ans1, 157);
         assert_eq!(ans2, 70);
     }

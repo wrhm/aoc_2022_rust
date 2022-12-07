@@ -1,6 +1,8 @@
 use crate::util;
 
-fn day_05_impl(file_contents: &str) -> (String, String) {
+use std::time::Instant;
+
+fn day_05_both_parts(file_contents: &str) -> (String, String) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
 
     // find number of columns
@@ -85,18 +87,22 @@ fn day_05_impl(file_contents: &str) -> (String, String) {
 }
 
 pub(crate) fn day_05(filename: &str) {
-    util::day_n_str_str(filename, "05", day_05_impl);
+    let now = Instant::now();
+    let file_contents = util::get_file_contents(filename);
+    let (ans1, ans2) = day_05_both_parts(&file_contents);
+    let elapsed = now.elapsed();
+    println!("Day 05: {}, {}. {:?}", ans1, ans2, elapsed);
 }
 
 #[cfg(test)]
 mod tests {
-    use super::day_05_impl;
+    use super::day_05_both_parts;
     use crate::util;
 
     #[test]
     fn unit_test() {
         let file_contents = util::get_file_contents("test_data/05.txt");
-        let (ans1, ans2) = day_05_impl(&file_contents);
+        let (ans1, ans2) = day_05_both_parts(&file_contents);
         assert_eq!(ans1, "CMZ".to_string());
         assert_eq!(ans2, "MCD".to_string());
     }

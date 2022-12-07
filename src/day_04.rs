@@ -1,6 +1,8 @@
 use crate::util;
 
-fn day_04_impl(file_contents: &str) -> (i32, i32) {
+use std::time::Instant;
+
+fn day_04_both_parts(file_contents: &str) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
     let mut count = 0;
     let mut count2 = 0;
@@ -31,18 +33,22 @@ fn day_04_impl(file_contents: &str) -> (i32, i32) {
 }
 
 pub(crate) fn day_04(filename: &str) {
-    util::day_n_i32_i32(filename, "04", day_04_impl);
+    let now = Instant::now();
+    let file_contents = util::get_file_contents(filename);
+    let (ans1, ans2) = day_04_both_parts(&file_contents);
+    let elapsed = now.elapsed();
+    println!("Day 04: {}, {}. {:?}", ans1, ans2, elapsed);
 }
 
 #[cfg(test)]
 mod tests {
-    use super::day_04_impl;
+    use super::day_04_both_parts;
     use crate::util;
 
     #[test]
     fn unit_test() {
         let file_contents = util::get_file_contents("test_data/04.txt");
-        let (ans1, ans2) = day_04_impl(&file_contents);
+        let (ans1, ans2) = day_04_both_parts(&file_contents);
         assert_eq!(ans1, 2);
         assert_eq!(ans2, 4);
     }

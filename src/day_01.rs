@@ -1,6 +1,8 @@
 use crate::util;
 
-fn day_01_impl(file_contents: &str) -> (i32, i32) {
+use std::time::Instant;
+
+fn day_01_both_parts(file_contents: &str) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
 
     // parse file into groups of food items held by each elf
@@ -31,18 +33,22 @@ fn day_01_impl(file_contents: &str) -> (i32, i32) {
 }
 
 pub(crate) fn day_01(filename: &str) {
-    util::day_n_i32_i32(filename, "01", day_01_impl);
+    let now = Instant::now();
+    let file_contents = util::get_file_contents(filename);
+    let (ans1, ans2) = day_01_both_parts(&file_contents);
+    let elapsed = now.elapsed();
+    println!("Day 01: {}, {}. {:?}", ans1, ans2, elapsed);
 }
 
 #[cfg(test)]
 mod tests {
-    use super::day_01_impl;
+    use super::day_01_both_parts;
     use crate::util;
 
     #[test]
     fn unit_test() {
         let file_contents = util::get_file_contents("test_data/01.txt");
-        let (ans1, ans2) = day_01_impl(&file_contents);
+        let (ans1, ans2) = day_01_both_parts(&file_contents);
         assert_eq!(ans1, 24000);
         assert_eq!(ans2, 45000);
     }
