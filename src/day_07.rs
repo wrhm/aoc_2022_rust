@@ -3,51 +3,44 @@ use crate::util;
 use std::collections::HashMap;
 use std::time::Instant;
 
-fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
-    let lines: Vec<&str> = file_contents.split('\n').collect();
-    let mut path_segments: Vec<String> = vec![];
-    // stores size of each file (using full filepath)
-    let mut filepaths: HashMap<String, i32> = HashMap::new();
-    for line in lines {
-        if line.is_empty() {
-            continue;
+fn interpret_line(
+    line: &str,
+    path_segments: &mut Vec<String>,
+    filepaths: &mut HashMap<String, i32>,
+) {
+    let parts: Vec<&str> = line.split_whitespace().into_iter().collect();
+    let p0 = parts[0];
+    let p1 = parts[1];
+    let p0c0 = p0.chars().next().unwrap();
+    if p0c0 == '$' {
+        // ignore `$ ls`
+        if p1 != "cd" {
+            return;
         }
-        let parts: Vec<&str> = line.split_whitespace().into_iter().collect();
-        let p0 = parts[0];
-        let p1 = parts[1];
-        let p0c0 = p0.chars().next().unwrap();
-        if p0c0 == '$' {
-            if p1 == "cd" {
-                let p2 = parts[2];
-                if p2 == "/" {
-                    // $ cd /
-                    path_segments = vec![];
-                } else if p2 == ".." {
-                    // $ cd ..
-                    path_segments.pop();
-                } else {
-                    // $ cd x
-                    path_segments.push(p2.to_string());
-                }
-            } else {
-                // $ ls
-                continue;
-            }
-        } else if p0c0 == 'd' {
-            // dir <directory>
-            continue;
+        let p2 = parts[2];
+        if p2 == "/" {
+            // $ cd /
+            // path_segments = vec![];
+            path_segments.clear();
+        } else if p2 == ".." {
+            // $ cd ..
+            path_segments.pop();
         } else {
-            // <size> <filename>
-            let mut dir_segs = path_segments.clone();
-            dir_segs.push(p1.to_string());
-            let sz = p0.parse::<i32>().unwrap();
-            filepaths.insert(dir_segs.join("/"), sz);
+            // $ cd x
+            path_segments.push(p2.to_string());
         }
+    } else if p0c0 != 'd' {
+        // <size> <filename>. ignore `dir [...]`
+        let mut dir_segs = path_segments.clone();
+        dir_segs.push(p1.to_string());
+        let sz = p0.parse::<i32>().unwrap();
+        filepaths.insert(dir_segs.join("/"), sz);
     }
+}
 
-    // calculate total size of each directory
+fn calculate_directory_sizes(filepaths: &HashMap<String, i32>) -> HashMap<String, i32> {
     let mut totals: HashMap<String, i32> = HashMap::new();
-    for (k, v) in &filepaths {
+    for (k, v) in filepaths {
         let mut parts: Vec<&str> = k.split('/').collect();
         parts.pop(); // exclude filename portion of path
         loop {
@@ -63,34 +56,52 @@ fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
             }
         }
     }
+    totals
+}
 
-    let max_allowed_dir_size = 100000;
-    let mut ans1 = 0;
-    for v in totals.values() {
-        if *v <= max_allowed_dir_size {
-            ans1 += v;
-        }
-    }
+const MAX_ALLOWED_DIR_SIZE: i32 = 100000;
+const TOTAL_DISK: i32 = 70000000;
+const SPACE_FOR_UPDATE: i32 = 30000000;
 
-    let total_disk = 70000000;
-    let space_for_update = 30000000;
-    let total_used = *totals.get("").unwrap(); // size of root ("/")
-    let unused = total_disk - total_used;
-    let min_to_delete = space_for_update - unused;
-
-    let mut ans2 = 0;
+fn smallest_overrun(totals: &HashMap<String, i32>, lower_bound: i32) -> i32 {
     // avoid sorting by doing a linear seek and track the smallest overrun.
-    let mut smallest_overrun = total_disk;
+    let mut smallest_overrun = TOTAL_DISK;
+    let mut ret = 0;
     for s in totals.values() {
-        if *s < min_to_delete {
+        if *s < lower_bound {
             continue;
         }
-        let overrun = s - min_to_delete;
+        let overrun = s - lower_bound;
         if overrun < smallest_overrun {
             smallest_overrun = overrun;
-            ans2 = *s;
+            ret = *s;
         }
     }
+    ret
+}
+
+fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
+    let lines: Vec<&str> = file_contents.split('\n').collect();
+    let mut path_segments: Vec<String> = vec![];
+    // stores size of each file (using full filepath)
+    let mut filepaths: HashMap<String, i32> = HashMap::new();
+    for line in lines {
+        if line.is_empty() {
+            continue;
+        }
+        interpret_line(line, &mut path_segments, &mut filepaths);
+    }
+
+    let totals = calculate_directory_sizes(&filepaths);
+    let ans1: i32 = totals
+        .values()
+        .filter(|&v| *v <= MAX_ALLOWED_DIR_SIZE)
+        .sum();
+
+    let total_used = *totals.get("").unwrap(); // size of root ("/")
+    let unused = TOTAL_DISK - total_used;
+    let min_to_delete = SPACE_FOR_UPDATE - unused;
+    let ans2 = smallest_overrun(&totals, min_to_delete);
 
     (ans1, ans2)
 }
