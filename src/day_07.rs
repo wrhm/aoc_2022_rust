@@ -3,15 +3,10 @@ use crate::util;
 use std::collections::HashMap;
 use std::time::Instant;
 
-// find all of the directories with a total size of at most 100000, then
-// calculate the sum of their total sizes
-
-// Idea: build a hashmap of filepath to size. Then walk this map, for each
-// path, increase in a second map all subpaths by the filesize. Filter the
-// keys of the second map by the max-size constraint.
 fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
     let mut path_segments: Vec<String> = vec![];
+    // stores size of each file (using full filepath)
     let mut filepaths: HashMap<String, i32> = HashMap::new();
     for line in lines {
         if line.is_empty() {
@@ -40,8 +35,7 @@ fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
             }
         } else if p0c0 == 'd' {
             // dir <directory>
-            let mut dir_segs = path_segments.clone();
-            dir_segs.push(p1.to_string());
+            continue;
         } else {
             // <size> <filename>
             let mut dir_segs = path_segments.clone();
@@ -51,6 +45,7 @@ fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
         }
     }
 
+    // calculate total size of each directory
     let mut totals: HashMap<String, i32> = HashMap::new();
     for (k, v) in &filepaths {
         let mut parts: Vec<&str> = k.split('/').collect();
@@ -61,6 +56,7 @@ fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
                 *totals.entry(partial_prefix).or_insert(0) += v;
                 parts.pop();
             }
+            // handle the root directory
             if parts.is_empty() {
                 *totals.entry("".to_string()).or_insert(0) += v;
                 break;
@@ -68,8 +64,6 @@ fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
         }
     }
 
-    let total_disk = 70000000;
-    let space_for_update = 30000000;
     let max_allowed_dir_size = 100000;
     let mut ans1 = 0;
     for v in totals.values() {
@@ -78,17 +72,23 @@ fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
         }
     }
 
+    let total_disk = 70000000;
+    let space_for_update = 30000000;
     let total_used = *totals.get("").unwrap(); // size of root ("/")
     let unused = total_disk - total_used;
     let min_to_delete = space_for_update - unused;
 
     let mut ans2 = 0;
-    let mut sizes: Vec<i32> = totals.into_values().collect();
-    sizes.sort();
-    for s in sizes {
-        if s >= min_to_delete {
-            ans2 = s;
-            break;
+    // avoid sorting by doing a linear seek and track the smallest overrun.
+    let mut smallest_overrun = total_disk;
+    for s in totals.values() {
+        if *s < min_to_delete {
+            continue;
+        }
+        let overrun = s - min_to_delete;
+        if overrun < smallest_overrun {
+            smallest_overrun = overrun;
+            ans2 = *s;
         }
     }
 
