@@ -1,9 +1,7 @@
 use crate::util;
 
-use std::{
-    collections::{HashMap, HashSet},
-    time::Instant,
-};
+use std::collections::HashMap;
+use std::time::Instant;
 
 // find all of the directories with a total size of at most 100000, then
 // calculate the sum of their total sizes
@@ -13,17 +11,13 @@ use std::{
 // keys of the second map by the max-size constraint.
 fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
-    // let mut prefix = "".to_string();
     let mut path_segments: Vec<String> = vec![];
-    // let mut dirs: HashSet<String> = HashSet::new();
     let mut filepaths: HashMap<String, i32> = HashMap::new();
     for line in lines {
         if line.is_empty() {
             continue;
         }
         let parts: Vec<&str> = line.split_whitespace().into_iter().collect();
-        println!("{}: {:?}", line, parts);
-        // let initial_char = parts[0].chars().nth(0).unwrap();
         let p0 = parts[0];
         let p1 = parts[1];
         let p0c0 = p0.chars().next().unwrap();
@@ -48,7 +42,6 @@ fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
             // dir <directory>
             let mut dir_segs = path_segments.clone();
             dir_segs.push(p1.to_string());
-            // dirs.insert(dir_segs.join("/"));
         } else {
             // <size> <filename>
             let mut dir_segs = path_segments.clone();
@@ -57,21 +50,15 @@ fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
             filepaths.insert(dir_segs.join("/"), sz);
         }
     }
-    for (k, v) in &filepaths {
-        println!("{} has size {}", k, v);
-    }
+
     let mut totals: HashMap<String, i32> = HashMap::new();
     for (k, v) in &filepaths {
-        // println!("{} has size {}", k, v);
         let mut parts: Vec<&str> = k.split('/').collect();
         parts.pop(); // exclude filename portion of path
         loop {
             let partial_prefix = parts.join("/");
-            // *left_counts.entry(c).or_insert(1) += 1;
             if !parts.is_empty() {
-                println!("{} adds {} to {}", k, v, partial_prefix);
                 *totals.entry(partial_prefix).or_insert(0) += v;
-                // println!("{} now has {}", &partial_prefix, totals[&partial_prefix]);
                 parts.pop();
             }
             if parts.is_empty() {
@@ -85,22 +72,15 @@ fn day_07_both_parts(file_contents: &str) -> (i32, i32) {
     let space_for_update = 30000000;
     let max_allowed_dir_size = 100000;
     let mut ans1 = 0;
-
-    println!("=== Totals ===");
-    for (k, v) in &totals {
-        println!("{} has size {}", k, v);
+    for v in totals.values() {
         if *v <= max_allowed_dir_size {
             ans1 += v;
         }
     }
-    let total_used = *totals.get("").unwrap();
+
+    let total_used = *totals.get("").unwrap(); // size of root ("/")
     let unused = total_disk - total_used;
-    println!(
-        "total_disk - total_used = {} - {} = {}",
-        total_disk, total_used, unused
-    );
     let min_to_delete = space_for_update - unused;
-    println!("min_to_delete: {}", min_to_delete);
 
     let mut ans2 = 0;
     let mut sizes: Vec<i32> = totals.into_values().collect();
