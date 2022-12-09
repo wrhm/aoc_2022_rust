@@ -6,6 +6,7 @@ mod day_05;
 mod day_06;
 mod day_07;
 mod day_08;
+mod day_09;
 mod util;
 
 use std::time::Instant;
@@ -26,6 +27,7 @@ fn main() {
     day_06::day_06("../data/06.txt");
     day_07::day_07("../data/07.txt");
     day_08::day_08("../data/08.txt");
+    day_09::day_09("../data/09.txt");
     let elapsed = now.elapsed();
     println!("Ran all (implemented) solutions in {:?}", elapsed);
 }

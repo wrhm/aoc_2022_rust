@@ -71,14 +71,7 @@ fn day_08_both_parts(file_contents: &str) -> (i32, i32) {
         }
     }
 
-    let mut ans1 = 0;
-    for row in vf {
-        for el in row {
-            if el {
-                ans1 += 1;
-            }
-        }
-    }
+    let ans1 = vf.iter().flat_map(|v| v.iter()).map(|b| *b as i32).sum();
 
     // === part 2 ===
     let mut ans2 = 0;
