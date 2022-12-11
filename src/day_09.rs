@@ -117,9 +117,6 @@ mod tests {
         let file_contents = util::get_file_contents("test_data/09.txt");
         let (ans1, ans2) = day_09_both_parts(&file_contents);
         assert_eq!(ans1, 13);
-        if ans1 == 13 {
-            println!("PASSED ans1 TEST");
-        }
         assert_eq!(ans2, 1);
     }
 
