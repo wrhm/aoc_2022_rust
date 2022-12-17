@@ -10,6 +10,7 @@ fn drop_grain(drop_loc: (i32, i32), max_row: i32, hs: &mut HashSet<(i32, i32)>) 
     // );
     let (mut c, mut r) = drop_loc;
     loop {
+        // println!("({},{})", c, r);
         if r > max_row {
             return false;
         }
@@ -70,13 +71,55 @@ fn day_14_both_parts(file_contents: &str) -> (i32, i32) {
     for r in occupied_rows {
         max_occ_row = std::cmp::max(max_occ_row, r);
     }
-    let mut n = 0;
-    while drop_grain((500, 0), max_occ_row, &mut hs) {
-        n += 1;
+    let mut hs_part1 = hs.clone();
+    let mut ans1 = 0;
+    while drop_grain((500, 0), max_occ_row, &mut hs_part1) {
+        ans1 += 1;
     }
 
-    let ans1 = n;
-    let ans2 = 0;
+    // println!("PART 1");
+    // for r in 0..max_occ_row {
+    //     let mut msg: Vec<char> = vec![];
+    //     for c in 480..520 {
+    //         if hs_part1.contains(&(c, r)) {
+    //             msg.push('X');
+    //         } else {
+    //             msg.push('.');
+    //         }
+    //     }
+    //     let msgc: String = msg.into_iter().collect();
+    //     println!("{}", msgc);
+    // }
+
+    let mut hs_part2 = hs.clone();
+    for c in 300..700 {
+        hs_part2.insert((c, max_occ_row + 2));
+    }
+    let mut limit = 100000;
+    let mut ans2 = 0;
+    while limit > 0
+        && !hs_part2.contains(&(500, 0))
+        && drop_grain((500, 0), max_occ_row + 2, &mut hs_part2)
+    {
+        // println!("Dropping #{}", ans2);
+        ans2 += 1;
+        limit -= 1;
+    }
+
+    // println!("PART 2");
+    // for r in 0..max_occ_row + 3 {
+    //     let mut msg: Vec<char> = vec![];
+    //     for c in 480..520 {
+    //         if hs_part2.contains(&(c, r)) {
+    //             msg.push('X');
+    //         } else {
+    //             msg.push('.');
+    //         }
+    //     }
+    //     let msgc: String = msg.into_iter().collect();
+    //     println!("{}", msgc);
+    // }
+
     (ans1, ans2)
 }
 
@@ -96,8 +139,8 @@ mod tests {
     #[test]
     fn unit_test() {
         let file_contents = util::get_file_contents("test_data/14.txt");
-        let (ans1, _) = day_14_both_parts(&file_contents);
+        let (ans1, ans2) = day_14_both_parts(&file_contents);
         assert_eq!(ans1, 24);
-        // assert_eq!(ans2, -1);
+        assert_eq!(ans2, 93);
     }
 }
