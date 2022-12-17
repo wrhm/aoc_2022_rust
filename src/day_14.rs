@@ -4,13 +4,8 @@ use std::{collections::HashSet, time::Instant};
 
 // returns true iff grain came to rest
 fn drop_grain(drop_loc: (i32, i32), max_row: i32, hs: &mut HashSet<(i32, i32)>) -> bool {
-    // println!(
-    //     "Dropping grain at ({},{}) with max_row={}",
-    //     drop_loc.0, drop_loc.1, max_row
-    // );
     let (mut c, mut r) = drop_loc;
     loop {
-        // println!("({},{})", c, r);
         if r > max_row {
             return false;
         }
@@ -77,48 +72,15 @@ fn day_14_both_parts(file_contents: &str) -> (i32, i32) {
         ans1 += 1;
     }
 
-    // println!("PART 1");
-    // for r in 0..max_occ_row {
-    //     let mut msg: Vec<char> = vec![];
-    //     for c in 480..520 {
-    //         if hs_part1.contains(&(c, r)) {
-    //             msg.push('X');
-    //         } else {
-    //             msg.push('.');
-    //         }
-    //     }
-    //     let msgc: String = msg.into_iter().collect();
-    //     println!("{}", msgc);
-    // }
-
     let mut hs_part2 = hs.clone();
     for c in 300..700 {
         hs_part2.insert((c, max_occ_row + 2));
     }
-    let mut limit = 100000;
-    let mut ans2 = 0;
-    while limit > 0
-        && !hs_part2.contains(&(500, 0))
-        && drop_grain((500, 0), max_occ_row + 2, &mut hs_part2)
-    {
-        // println!("Dropping #{}", ans2);
-        ans2 += 1;
-        limit -= 1;
-    }
 
-    // println!("PART 2");
-    // for r in 0..max_occ_row + 3 {
-    //     let mut msg: Vec<char> = vec![];
-    //     for c in 480..520 {
-    //         if hs_part2.contains(&(c, r)) {
-    //             msg.push('X');
-    //         } else {
-    //             msg.push('.');
-    //         }
-    //     }
-    //     let msgc: String = msg.into_iter().collect();
-    //     println!("{}", msgc);
-    // }
+    let mut ans2 = 0;
+    while !hs_part2.contains(&(500, 0)) && drop_grain((500, 0), max_occ_row + 2, &mut hs_part2) {
+        ans2 += 1;
+    }
 
     (ans1, ans2)
 }
