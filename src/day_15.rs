@@ -9,10 +9,9 @@ use std::{
 
 type Point = (i32, i32);
 
-fn day_15_both_parts(file_contents: &str, row: i32, col_min: i32, col_max: i32) -> (i32, i32) {
+fn day_15_both_parts(file_contents: &str, row: i32) -> (i32, i32) {
     let lines: Vec<&str> = file_contents.split('\n').collect();
 
-    // let mut sensors: HashSet<Point> = HashSet::new();
     let mut beacons: HashSet<Point> = HashSet::new();
     let mut closest_beacon: HashMap<Point, Point> = HashMap::new();
 
@@ -34,46 +33,51 @@ fn day_15_both_parts(file_contents: &str, row: i32, col_min: i32, col_max: i32) 
         let bx = matches[2];
         let by = matches[3];
 
-        // sensors.insert((sx, sy));
         beacons.insert((bx, by));
         closest_beacon.insert((sx, sy), (bx, by));
     }
-    let mut ans1 = 0;
-    let mut left_most = 999999999;
-    let mut right_most = -999999999;
-    for col in col_min..col_max {
-        // 4961647
-        let current: Point = (col, row);
-        if beacons.contains(&current) {
-            // println!("({},{}) is a beacon", col, row);
 
-            left_most = std::cmp::min(left_most, col);
-            right_most = std::cmp::max(right_most, col);
+    type Interval = (i32, i32);
+    // inclusive ranges of columns where there cannot be a beacon on `row`.
+    let mut forbidden_ranges: HashSet<Interval> = HashSet::new();
+    let mut beacons_on_row: HashSet<i32> = HashSet::new();
+    for (s, b) in &closest_beacon {
+        if b.1 == row {
+            beacons_on_row.insert(b.0);
+        }
+        let sensor_reach = (s.0 - b.0).abs() + (s.1 - b.1).abs();
+        let (s_col, s_row) = s;
+        let vert = (s_row - row).abs();
+        if vert > sensor_reach {
+            // sensor can't reach row
             continue;
         }
-        let mut is_seen: bool = false;
-        for (s, b) in &closest_beacon {
-            let sensor_reach = (s.0 - b.0).abs() + (s.1 - b.1).abs();
-            let current_d = (s.0 - current.0).abs() + (s.1 - current.1).abs();
-            if current_d <= sensor_reach {
-                // println!(
-                //     "({},{}) is within reach of station at ({},{})",
-                //     col,
-                //     row, s.0, s.1
-                // );
-                is_seen = true;
-                left_most = std::cmp::min(left_most, col);
-                right_most = std::cmp::max(right_most, col);
-                break;
-                // ans1 += 1;
-                // println!("count is now {}", ans1);
-            }
+
+        let range_min = s_col - (sensor_reach - vert);
+        let range_max = s_col + (sensor_reach - vert);
+        forbidden_ranges.insert((range_min, range_max));
+    }
+    let mut frv: Vec<Interval> = forbidden_ranges.into_iter().collect();
+    frv.sort_by(|a, b| a.0.cmp(&b.0));
+    let mut merged: Vec<Interval> = vec![];
+    for (a, b) in frv {
+        if merged.is_empty() {
+            merged.push((a, b));
+            continue;
         }
-        if is_seen {
-            ans1 += 1;
+        let &(c, d) = merged.last().unwrap();
+        if (a >= c && a <= d) || (b >= c && b <= d) || (c >= a && c <= b) || (d >= a && d <= b) {
+            merged.pop();
+            merged.push((std::cmp::min(a, c), std::cmp::max(b, d)));
+        } else {
+            merged.push((a, b));
         }
     }
-    println!("left_most: {}, right_most: {}", left_most, right_most);
+    let mut merged_tot = 0 - (beacons_on_row.len() as i32);
+    for (a, b) in merged {
+        merged_tot += b - a + 1;
+    }
+    let ans1 = merged_tot;
     let ans2 = 0;
     (ans1, ans2)
 }
@@ -81,15 +85,7 @@ fn day_15_both_parts(file_contents: &str, row: i32, col_min: i32, col_max: i32) 
 pub(crate) fn day_15(filename: &str) {
     let now = Instant::now();
     let file_contents = util::get_file_contents(filename);
-    // for col in 0..6000000 { // 4262661
-    let million = 1000000;
-    // for col in (-1*million)..(8*million) { // 4961647
-
-    // let low_bound = -2 * million;
-    // let high_bound = 10 * million;
-    let low_bound = -million;
-    let high_bound = 5 * million;
-    let (ans1, ans2) = day_15_both_parts(&file_contents, 2000000, low_bound, high_bound);
+    let (ans1, ans2) = day_15_both_parts(&file_contents, 2000000);
     let elapsed = now.elapsed();
     println!("Day 15: {}, {}. {:?}", ans1, ans2, elapsed);
 }
@@ -102,7 +98,7 @@ mod tests {
     #[test]
     fn unit_test() {
         let file_contents = util::get_file_contents("test_data/15.txt");
-        let (ans1, _) = day_15_both_parts(&file_contents, 10, -50, 50);
+        let (ans1, _) = day_15_both_parts(&file_contents, 10);
         assert_eq!(ans1, 26);
         // assert_eq!(ans2, 56000011);
     }
