@@ -525,7 +525,30 @@ fn day_13_both_parts(file_contents: &str) -> (i32, i32) {
         }
     }
 
-    let ans2 = 0;
+    let mut ans2 = 1;
+    let mut packets: Vec<Packet> = lines.into_iter().map(parse_str_into_packet).collect();
+    let p_two = List(vec![List(vec![Num(2)])]);
+    let p_two_clone = List(vec![List(vec![Num(2)])]);
+    let p_six = List(vec![List(vec![Num(6)])]);
+    let p_six_clone = List(vec![List(vec![Num(6)])]);
+    packets.push(p_two);
+    packets.push(p_six);
+    packets.sort_by(|a, b| cmp_packets2(a, b).unwrap());
+    println!("Sorted:");
+    // println!("{:?}", packets);
+    for (i, p) in packets.iter().enumerate() {
+        println!("{}: {:?}", i + 1, p);
+        if cmp_packets2(p, &p_two_clone) == Some(Equal) {
+            println!("^FOUND 2 at {}", i + 1);
+            // break;
+            ans2 *= i as i32 + 1;
+        }
+        if cmp_packets2(p, &p_six_clone) == Some(Equal) {
+            println!("^FOUND 6 at {}", i + 1);
+            // break;
+            ans2 *= i as i32 + 1;
+        }
+    }
     (ans1, ans2)
 }
 
@@ -545,8 +568,8 @@ mod tests {
     #[test]
     fn unit_test() {
         let file_contents = util::get_file_contents("test_data/13.txt");
-        let (ans1, _) = day_13_both_parts(&file_contents);
+        let (ans1, ans2) = day_13_both_parts(&file_contents);
         assert_eq!(ans1, 13);
-        // assert_eq!(ans2, -1);
+        assert_eq!(ans2, 140);
     }
 }
