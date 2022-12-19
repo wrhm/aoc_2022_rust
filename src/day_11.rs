@@ -46,7 +46,6 @@ fn parse_monkeys(lines: Vec<&str>) -> Vec<(Items, RuleExpr, i64, i32, i32)> {
                 true_ind,
                 false_ind,
             );
-            // println!("{:?}", monkey);
             monkeys.push(monkey);
             mut_ref_items.clear();
         }
@@ -54,12 +53,7 @@ fn parse_monkeys(lines: Vec<&str>) -> Vec<(Items, RuleExpr, i64, i32, i32)> {
     monkeys
 }
 
-// TODO: take in grand_modulus, which is the product of all monkeys' moduli
-fn update_worry(
-    item: i64,
-    op: char,
-    val: &str, //, grand_modulus: i64
-) -> i64 {
+fn update_worry(item: i64, op: char, val: &str) -> i64 {
     let other = if val == "old" {
         item
     } else {
@@ -67,11 +61,8 @@ fn update_worry(
     };
     if op == '+' {
         item + other
-        // (item + other) % grand_modulus
     } else {
-        // println!("About to multiply {} * {}", item, other);
         item * other
-        // (item * other) % grand_modulus
     }
 }
 
@@ -102,39 +93,24 @@ fn day_11_both_parts(file_contents: &str) -> (i32, i64) {
                     } else {
                         *fa as usize
                     };
-                    // println!(
-                    //     "Moving item from {} to {} as {} -> {} -> {}",
-                    //     i, recipient, item, worry, worry
-                    // );
                     new_vals.push((recipient, worry));
                 }
             }
             // begin (implict) second mutable scope
             for (j, v) in new_vals {
-                // println!("Throwing item {} to monkey {}", v, j);
                 monkeys[j].0.push_back(v);
             }
-            // println!("{:?}", monkeys);
         }
-        // println!("After round #{}:", round);
-        // for m in &monkeys {
-        //     println!("{:?}", m.0);
-        // }
     }
-    // println!("inspections: {:?}", inspections);
     inspections.sort_by(|a, b| b.cmp(a));
-    // println!("inspections: {:?}", inspections);
 
     let ans1 = inspections[0] * inspections[1];
-
-    // println!(" ==== BEGIN PART 2 ====");
 
     // part 2
     let mut monkeys = parse_monkeys(lines);
     let mut inspections2: Vec<i64> = (0..monkeys.len()).map(|_| 0).collect();
 
-    for round in 1..(10000 + 1) {
-        println!("round {}", round);
+    for _ in 1..(10000 + 1) {
         for i in 0..monkeys.len() {
             let mut new_vals: Vec<(usize, i64)> = vec![];
             // begin first mutable scope
@@ -149,29 +125,16 @@ fn day_11_both_parts(file_contents: &str) -> (i32, i64) {
                     } else {
                         *fa as usize
                     };
-                    // println!(
-                    //     "Moving item from {} to {} as {} -> {} -> {}",
-                    //     i, recipient, item, worry, worry
-                    // );
                     new_vals.push((recipient, worry));
                 }
             }
             // begin (implict) second mutable scope
             for (j, v) in new_vals {
-                // println!("Throwing item {} to monkey {}", v, j);
                 monkeys[j].0.push_back(v);
             }
-            // println!("{:?}", monkeys);
         }
-        // println!("After round #{}:", round);
-        for m in &monkeys {
-            println!("{:?}", m.0);
-        }
-        // println!("inspections: {:?}", inspections2);
     }
-    // println!("inspections: {:?}", inspections2);
     inspections2.sort_by(|a, b| b.cmp(a));
-    // println!("inspections: {:?}", inspections2);
 
     let ans2: i64 = inspections2[0] * inspections2[1];
     (ans1, ans2)
